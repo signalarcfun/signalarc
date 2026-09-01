@@ -7,14 +7,17 @@ import (
 	"testing"
 )
 
-func TestIsCORSOriginAllowedIncludesLocalDefaults(t *testing.T) {
+func TestIsCORSOriginAllowedIncludesDefaultFrontendOrigins(t *testing.T) {
 	t.Setenv("CORS_ALLOWED_ORIGINS", "")
 
-	if !isCORSOriginAllowed("http://localhost:3000") {
-		t.Fatal("expected localhost frontend origin to be allowed")
-	}
-	if !isCORSOriginAllowed("http://127.0.0.1:3000") {
-		t.Fatal("expected loopback frontend origin to be allowed")
+	for _, origin := range []string{
+		"http://localhost:3000",
+		"http://127.0.0.1:3000",
+		"https://signalarc.fun",
+	} {
+		if !isCORSOriginAllowed(origin) {
+			t.Fatalf("expected default frontend origin %q to be allowed", origin)
+		}
 	}
 }
 
