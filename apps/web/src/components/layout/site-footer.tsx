@@ -51,7 +51,7 @@ const reviewerLinks = [
     external: true,
   },
   {
-    href: "https://github.com/wahyu241205/SignalArc",
+    href: "https://github.com/signalarcfun/signalarc",
     label: "GitHub",
     external: true,
   },

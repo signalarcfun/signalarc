@@ -5,7 +5,7 @@ This file is the handoff source of truth for continuing SignalArc work in a new 
 ## Project
 
 - Name: SignalArc
-- Repository: https://github.com/wahyu241205/SignalArc
+- Repository: https://github.com/signalarcfun/signalarc
 - Positioning: Arc-native prediction market infrastructure, not a Polymarket clone
 - Core idea: Convert market opinions into structured probability signals, support USDC-settled event markets, expose market intelligence through APIs, and make the system usable by creators, institutions, developers, and AI agents.
 

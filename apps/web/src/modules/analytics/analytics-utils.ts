@@ -381,7 +381,7 @@ export const analyticsBackendMetrics = [
 export const analyticsPublicLinks: AnalyticsPublicLink[] = [
   { label: "Website", href: "https://www.signalarc.fun" },
   { label: "Docs", href: "https://docs.signalarc.fun" },
-  { label: "GitHub", href: "https://github.com/wahyu241205/SignalArc" },
+  { label: "GitHub", href: "https://github.com/signalarcfun/signalarc" },
   { label: "Active factory on Arcscan", href: `${ARCSCAN_BASE_URL}/address/${ACTIVE_FACTORY_ADDRESS}` },
   { label: "Legacy analytics factory on Arcscan", href: analyticsFactory.explorerUrl },
   { label: "Latest activity", href: analyticsLatestActivity.txUrl },
