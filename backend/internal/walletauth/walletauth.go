@@ -23,8 +23,12 @@ func NormalizeAddress(value string) (string, error) {
 	if !common.IsHexAddress(trimmed) {
 		return "", ErrInvalidAddress
 	}
+	address := common.HexToAddress(trimmed)
+	if address == (common.Address{}) {
+		return "", ErrInvalidAddress
+	}
 
-	return strings.ToLower(common.HexToAddress(trimmed).Hex()), nil
+	return strings.ToLower(address.Hex()), nil
 }
 
 func NewNonce() (string, error) {

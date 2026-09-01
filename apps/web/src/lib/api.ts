@@ -416,7 +416,7 @@ export function createMarket(input: CreateMarketRequest) {
 export function createWalletAuthChallenge(address: string) {
   return apiRequest<{ challenge: WalletAuthChallenge }>("/auth/wallet/challenge", {
     method: "POST",
-    body: { address },
+    body: { wallet_address: address },
   })
 }
 

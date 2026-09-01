@@ -46,11 +46,43 @@ func TestVerifyPersonalSignRejectsWrongWalletAndMalformedSignature(t *testing.T)
 }
 
 func TestNormalizeAddress(t *testing.T) {
-	got, err := NormalizeAddress(" 0xB592d99cb3c98b77777d6288e5E5782Ac2Ce919a ")
-	if err != nil {
-		t.Fatalf("normalize address: %v", err)
+	tests := []struct {
+		name    string
+		value   string
+		want    string
+		wantErr bool
+	}{
+		{
+			name:  "lowercase",
+			value: "0xb592d99cb3c98b77777d6288e5e5782ac2ce919a",
+			want:  "0xb592d99cb3c98b77777d6288e5e5782ac2ce919a",
+		},
+		{
+			name:  "checksummed with surrounding whitespace",
+			value: " 0xB592d99cb3c98b77777d6288e5E5782Ac2Ce919a ",
+			want:  "0xb592d99cb3c98b77777d6288e5e5782ac2ce919a",
+		},
+		{name: "empty", value: "", wantErr: true},
+		{name: "too short", value: "0xb592", wantErr: true},
+		{name: "non hexadecimal", value: "0xg592d99cb3c98b77777d6288e5e5782ac2ce919a", wantErr: true},
+		{name: "zero address", value: "0x0000000000000000000000000000000000000000", wantErr: true},
 	}
-	if want := "0xb592d99cb3c98b77777d6288e5e5782ac2ce919a"; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := NormalizeAddress(test.value)
+			if test.wantErr {
+				if err != ErrInvalidAddress {
+					t.Fatalf("expected ErrInvalidAddress, got %v", err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("normalize address: %v", err)
+			}
+			if got != test.want {
+				t.Fatalf("expected %q, got %q", test.want, got)
+			}
+		})
 	}
 }

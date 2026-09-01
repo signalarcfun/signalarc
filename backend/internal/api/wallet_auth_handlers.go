@@ -19,13 +19,34 @@ import (
 const walletAuthSessionLifetime = 24 * time.Hour
 
 type walletAuthChallengeRequest struct {
-	Address string `json:"address"`
+	WalletAddress string `json:"wallet_address"`
+	Address       string `json:"address"`
 }
 
 type walletAuthVerifyRequest struct {
 	ChallengeID string `json:"challenge_id"`
 	Address     string `json:"address"`
 	Signature   string `json:"signature"`
+}
+
+func (request walletAuthChallengeRequest) normalizedAddress() (string, error) {
+	walletAddress := strings.TrimSpace(request.WalletAddress)
+	addressAlias := strings.TrimSpace(request.Address)
+
+	if walletAddress == "" {
+		return walletauth.NormalizeAddress(addressAlias)
+	}
+
+	normalizedWalletAddress, err := walletauth.NormalizeAddress(walletAddress)
+	if err != nil || addressAlias == "" {
+		return normalizedWalletAddress, err
+	}
+	normalizedAddressAlias, err := walletauth.NormalizeAddress(addressAlias)
+	if err != nil || normalizedAddressAlias != normalizedWalletAddress {
+		return "", walletauth.ErrInvalidAddress
+	}
+
+	return normalizedWalletAddress, nil
 }
 
 func registerWalletAuthRoutes(router chi.Router, store *repository.WalletAuthRepository) {
@@ -36,7 +57,7 @@ func registerWalletAuthRoutes(router chi.Router, store *repository.WalletAuthRep
 			return
 		}
 
-		address, err := walletauth.NormalizeAddress(request.Address)
+		address, err := request.normalizedAddress()
 		if err != nil {
 			httpjson.WriteError(w, http.StatusBadRequest, "invalid_wallet_address", "wallet address is invalid")
 			return
