@@ -88,6 +88,14 @@ type marketResponse struct {
 	UpdatedAt               time.Time  `json:"updated_at"`
 }
 
+type walletAuthChallengeResponse struct {
+	ID            string    `json:"id"`
+	WalletAddress string    `json:"wallet_address"`
+	Nonce         string    `json:"nonce"`
+	Message       string    `json:"message"`
+	ExpiresAt     time.Time `json:"expires_at"`
+}
+
 type agentMarketResponse struct {
 	ID                    string    `json:"id"`
 	Title                 string    `json:"title"`
@@ -116,6 +124,16 @@ func newTradeResponse(trade repository.Trade) tradeResponse {
 		TxHash:           nullStringPtr(trade.TxHash),
 		CreatedAt:        trade.CreatedAt,
 		UpdatedAt:        trade.UpdatedAt,
+	}
+}
+
+func newWalletAuthChallengeResponse(challenge repository.WalletAuthChallenge) walletAuthChallengeResponse {
+	return walletAuthChallengeResponse{
+		ID:            challenge.ID,
+		WalletAddress: challenge.WalletAddress,
+		Nonce:         challenge.Nonce,
+		Message:       challenge.Message,
+		ExpiresAt:     challenge.ExpiresAt,
 	}
 }
 

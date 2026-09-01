@@ -10,33 +10,18 @@ import {
   verifyWalletAuthChallenge,
 } from "@/lib/api"
 import { wagmiConfig } from "@/lib/wagmi"
-
-function normalizeAddress(address: string) {
-  return address.trim().toLowerCase()
-}
+import { ensureWalletAuthSessionWithDependencies } from "@/lib/wallet-auth-flow"
 
 export async function ensureWalletAuthSession(address: Address) {
-  const existing = getWalletAuthSession()
-  if (
-    existing &&
-    normalizeAddress(existing.wallet_address) === normalizeAddress(address) &&
-    new Date(existing.expires_at).getTime() > Date.now()
-  ) {
-    return existing
-  }
-
-  setWalletAuthSession(null)
-  const challenge = await createWalletAuthChallenge(address)
-  const signature = await signMessage(wagmiConfig, {
-    account: address,
-    message: challenge.data.challenge.message,
+  return ensureWalletAuthSessionWithDependencies(address, {
+    getSession: getWalletAuthSession,
+    setSession: setWalletAuthSession,
+    createChallenge: createWalletAuthChallenge,
+    signChallenge: (account, message) =>
+      signMessage(wagmiConfig, {
+        account,
+        message,
+      }),
+    verifyChallenge: verifyWalletAuthChallenge,
   })
-  const verified = await verifyWalletAuthChallenge({
-    challenge_id: challenge.data.challenge.id,
-    address,
-    signature,
-  })
-
-  setWalletAuthSession(verified.data.session)
-  return verified.data.session
 }

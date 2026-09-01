@@ -54,7 +54,9 @@ func registerWalletAuthRoutes(router chi.Router, store *repository.WalletAuthRep
 			return
 		}
 
-		httpjson.WriteJSON(w, http.StatusCreated, map[string]any{"challenge": challenge})
+		httpjson.WriteJSON(w, http.StatusCreated, map[string]any{
+			"challenge": newWalletAuthChallengeResponse(challenge),
+		})
 	})
 
 	router.Post("/auth/wallet/verify", func(w http.ResponseWriter, r *http.Request) {
