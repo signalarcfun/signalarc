@@ -1,0 +1,12 @@
+{
+  "name": "signalarc",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev:web": "pnpm --dir apps/web dev",
+    "build:web": "pnpm --dir apps/web build",
+    "lint:web": "pnpm --dir apps/web lint",
+    "dev:api": "cd backend && go run ./cmd/api"
+  }
+}

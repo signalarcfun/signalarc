@@ -1,0 +1,49 @@
+steps:
+  - id: build-backend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - backend/Dockerfile
+      - -t
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/signalarc-backend-api:$SHORT_SHA
+      - backend
+
+  - id: push-backend-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/signalarc-backend-api:$SHORT_SHA
+
+  - id: deploy-backend-cloud-run
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - signalarc-backend-api
+      - --image
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/signalarc-backend-api:$SHORT_SHA
+      - --region
+      - asia-southeast1
+      - --platform
+      - managed
+      - --port
+      - "4000"
+      - --allow-unauthenticated
+      - --service-account
+      - 973633221696-compute@developer.gserviceaccount.com
+      - --add-cloudsql-instances
+      - signalarc-prod-241205:asia-southeast2:signalarc-postgres
+      - --max-instances
+      - "3"
+      - --set-env-vars
+      - ^|^APP_ENV=production|APP_PORT=4000|CORS_ALLOWED_ORIGINS=https://signalarc.fun,https://www.signalarc.fun|SIGNAL_ARC_MARKET_FACTORY_ADDRESS=0x02555FC5EE3c53938f2F0356e963865503442A56|CIRCLE_AGENT_WALLET_EXECUTION_ENABLED=true|CIRCLE_AGENT_ONBOARDING_OTP_START_ENABLED=true|CIRCLE_CLI_PATH=circle|CIRCLE_AGENT_WALLET_CHAIN=ARC-TESTNET|CIRCLE_AGENT_WALLET_FAUCET_ENABLED=true|CIRCLE_ACCEPT_TERMS=1
+      - --set-secrets
+      - DATABASE_URL=signalarc-database-url:latest
+
+images:
+  - asia-southeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/signalarc-backend-api:$SHORT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY

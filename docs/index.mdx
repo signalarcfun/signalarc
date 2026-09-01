@@ -1,0 +1,72 @@
+---
+title: SignalArc Documentation
+description: Arc-native prediction market infrastructure documentation for SignalArc.
+---
+
+# SignalArc Documentation
+
+SignalArc is an Arc-native prediction market infrastructure platform for USDC-settled event markets, market intelligence, resolver workflows, and agent-readable APIs. It is an API-first Web3 application stack for creators, institutions, developers, and AI agents.
+
+SignalArc is not positioned as a clone of any existing prediction market product. The repository contains a live web app, a live backend API, a modular local development stack, an Arc Testnet onchain deployment, and Custom GPT integration for agent-driven flows.
+
+## Current Status
+
+| Area | Status |
+| --- | --- |
+| Frontend | Live at https://signalarc.fun on Vercel. The Next.js app can also run locally with `pnpm dev:web`. |
+| Backend API | Live at https://api.signalarc.fun on GCP Cloud Run service `signalarc-backend-api`. |
+| Production database | GCP Cloud SQL PostgreSQL, migrated to version 18. |
+| Backend container | Includes Node/npm and the global Circle CLI (`@circle-fin/cli`) for ARC-TESTNET agent flows. |
+| Custom GPT | Preconfigured to call https://api.signalarc.fun. Users and judges do not import OpenAPI manually. |
+| Smart contract | `SignalArcMarket` deployed on Arc Testnet only. |
+| Settlement scope | Testnet/prototype only; no mainnet production settlement is claimed. |
+
+## Public URLs
+
+| Surface | URL | Status |
+| --- | --- | --- |
+| Frontend | https://signalarc.fun | Live web app on Vercel. |
+| API | https://api.signalarc.fun | Live backend on Cloud Run. |
+| Docs | https://docs.signalarc.fun | Documentation deployment target. |
+
+ngrok URLs are used for local development only. Production traffic always goes through https://signalarc.fun and https://api.signalarc.fun.
+
+## Documentation Map
+
+- [REST API](./API.md): live REST API reference.
+- [Agent API](./AGENT_API.md): live agent-facing API reference, agent flow, faucet endpoint, and judge testing guide.
+- [Architecture](./ARCHITECTURE.md): live system architecture and deployment topology.
+- [Local Development](./LOCAL_DEVELOPMENT.md): local setup, commands, and troubleshooting.
+- [Frontend Wallet](./FRONTEND_WALLET.md): external wallet integration and Arc Testnet trade flow.
+- [Onchain Integration](./ONCHAIN_INTEGRATION.md): Arc Testnet contract integration details.
+- [Deployment Plan](./DEPLOYMENT_PLAN.md): live production deployment topology and operational notes.
+- [Security and Secrets](./SECURITY_AND_SECRETS.md): security and secret handling policy.
+- [Grant Readiness](./GRANT_READINESS.md): Circle/Arc grant readiness status.
+- [Privacy Policy](./privacy): privacy policy for the SignalArc Arc Testnet prototype and Custom GPT Action.
+
+## Implemented Capabilities
+
+- Live frontend on Vercel and live API on Cloud Run.
+- Custom GPT preconfigured against the live API for onboarding, OTP verify, session, wallet, balance, ARC-TESTNET faucet, and market intent lifecycle.
+- Backend exposes health, readiness, schema validation, market, trade-intent, position, resolution, settlement, agent-market, and Arc contract metadata endpoints.
+- Backend exposes agent endpoints for onboarding, OTP verify, session, wallet, balance, ARC-TESTNET faucet, and market intent preview/confirm/execute.
+- Arc Testnet contract reference is available through the backend and frontend constants.
+- Local backend and PostgreSQL can run through Docker Compose; the frontend can run manually with `pnpm dev:web`.
+- Frontend wallet flow uses external wallet connection and Arc Testnet transactions for USDC/testnet USDC approval and `openPosition`. Wallet execution is Arc Testnet prototype behavior only and does not use real funds.
+
+## Out of Scope
+
+- Arc mainnet deployment.
+- Production custody, production settlement approval, or audit claim.
+- Arbitrary transfer, withdraw/deposit, agent logout/session-management endpoints, and mainnet funding actions.
+- API authentication enforcement, paid access, autonomous trading, and production SLA.
+
+## Maintainer-Only OpenAPI Import URL
+
+End users and grant judges do not need to import OpenAPI manually because the published Custom GPT is already wired to https://api.signalarc.fun.
+
+For maintainers who need to re-import the schema into a Custom GPT or OpenAPI tool:
+
+```text
+https://raw.githubusercontent.com/wahyu241205/SignalArc/main/project-roadmap/signalarc-custom-gpt-openapi.json
+```

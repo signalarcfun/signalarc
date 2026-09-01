@@ -1,0 +1,62 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "SignalArc",
+  "favicon": "/assets/favicon.ico",
+  "logo": {
+    "light": "/assets/favicon.ico",
+    "dark": "/assets/favicon.ico"
+  },
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#0F172A"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Overview",
+        "pages": [
+          "index",
+          "ARCHITECTURE",
+          "LOCAL_DEVELOPMENT"
+        ]
+      },
+      {
+        "group": "API and Agents",
+        "pages": [
+          "API",
+          "AGENT_API"
+        ]
+      },
+      {
+        "group": "Arc and Wallet",
+        "pages": [
+          "ONCHAIN_INTEGRATION",
+          "FRONTEND_WALLET"
+        ]
+      },
+      {
+        "group": "Deployment and Security",
+        "pages": [
+          "DEPLOYMENT_PLAN",
+          "SECURITY_AND_SECRETS",
+          "GRANT_READINESS"
+        ]
+      },
+      {
+        "group": "Legal",
+        "pages": [
+          "privacy"
+        ]
+      }
+    ]
+  },
+  "redirects": [
+    {
+      "source": "/README",
+      "destination": "/",
+      "permanent": false
+    }
+  ]
+}

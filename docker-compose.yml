@@ -1,0 +1,31 @@
+services:
+  signalarc-postgres:
+    image: postgres:15
+    container_name: signalarc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: signalarc
+      POSTGRES_USER: signalarc
+      POSTGRES_PASSWORD: signalarc_dev_password
+    ports:
+      - "127.0.0.1:15433:5432"
+    volumes:
+      - signalarc_postgres_data:/var/lib/postgresql/data
+
+  signalarc-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: signalarc-backend
+    restart: unless-stopped
+    depends_on:
+      - signalarc-postgres
+    environment:
+      APP_ENV: development
+      APP_PORT: "4000"
+      DATABASE_URL: postgres://signalarc:signalarc_dev_password@signalarc-postgres:5432/signalarc?sslmode=disable
+    ports:
+      - "127.0.0.1:4000:4000"
+
+volumes:
+  signalarc_postgres_data:

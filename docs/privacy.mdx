@@ -1,0 +1,107 @@
+---
+title: SignalArc Privacy Policy
+description: Privacy policy for the SignalArc Arc Testnet prototype, including the SignalArc Custom GPT Action.
+---
+
+# SignalArc Privacy Policy
+
+Last updated: 23 May 2026
+
+## 1. Prototype Scope
+
+SignalArc is an Arc Testnet prototype. SignalArc operates on ARC-TESTNET only.
+
+SignalArc uses testnet assets only. SignalArc does not handle real funds, does not perform mainnet settlement, and does not provide production custody. Any wallet activity exposed by SignalArc is testnet activity for prototype, demonstration, and grant evaluation purposes.
+
+This Privacy Policy applies to:
+
+- The SignalArc web app at https://signalarc.fun
+- The SignalArc backend API at https://api.signalarc.fun
+- The SignalArc documentation site at https://docs.signalarc.fun
+- The SignalArc Custom GPT Action that calls the SignalArc backend API on a user's behalf
+
+## 2. Data SignalArc Collects
+
+SignalArc collects only the data needed to operate the Arc Testnet prototype, the agent onboarding flow, and the Custom GPT Action.
+
+SignalArc collects:
+
+- The email address a user provides to the Circle Agent Wallet onboarding and OTP flow
+- The `agent_id` value associated with an agent session
+- Onboarding status, OTP verification status, and session status
+- The registered Circle Agent Wallet address linked to a user
+- Wallet balance metadata returned by the SignalArc API (for example, ARC-TESTNET native balance and testnet USDC balance summaries)
+- Market identifiers, intent identifiers, transaction hashes, and ARC-TESTNET interaction metadata generated through SignalArc flows
+- Basic API logs, including request path, HTTP status code, request ID, timestamp, and error code
+
+## 3. Data SignalArc Does Not Collect
+
+SignalArc does not collect, request, or store:
+
+- Private keys
+- Seed phrases
+- Recovery phrases
+- Wallet passwords
+- One-time passcode (OTP) values, unless a user manually provides an OTP value to the SignalArc API or Custom GPT Action to complete Circle Agent Wallet onboarding
+- Email inbox contents
+- Real-money payment data, real-world card data, or production banking data
+
+SignalArc never asks users for private keys, seed phrases, recovery phrases, or wallet passwords. Users should never share those values with SignalArc, the Custom GPT, or any third party.
+
+## 4. How SignalArc Uses Data
+
+SignalArc uses collected data to:
+
+- Operate the SignalArc API and the SignalArc Custom GPT Agent
+- Complete onboarding, OTP verification, session, and Circle Agent Wallet flows on ARC-TESTNET
+- Display wallet status, balances, and ARC-TESTNET market interaction status to the user or agent
+- Debug errors, diagnose failures, and improve reliability of the prototype
+- Support security and abuse prevention for the SignalArc API and infrastructure
+
+SignalArc does not use collected data for advertising, profiling, or resale.
+
+## 5. Third-Party Services
+
+SignalArc relies on the following third-party services. Each service has its own privacy practices, which apply to the data they receive.
+
+- Circle and the Circle Agent Wallet for wallet onboarding and ARC-TESTNET wallet operations.
+- Google Cloud Platform, including Cloud Run for backend hosting, Cloud SQL for the PostgreSQL database, and Cloud Logging for backend logs.
+- Vercel for frontend hosting.
+- OpenAI Custom GPT Actions for user-initiated API calls routed from the SignalArc Custom GPT to the SignalArc backend API.
+
+For Arc and Circle behavior, the authoritative sources are the Arc documentation at https://docs.arc.io/ and the Circle developer documentation at https://developers.circle.com/.
+
+## 6. Data Sharing and Sale
+
+SignalArc does not sell user data.
+
+SignalArc does not share collected data with third parties for advertising or marketing purposes.
+
+SignalArc shares data with the third-party services listed in section 5 only as required to operate the prototype (for example, sending an onboarding email through Circle, hosting backend services on Google Cloud, hosting the frontend on Vercel, and routing Custom GPT Action requests through OpenAI).
+
+## 7. User Responsibilities
+
+Users are responsible for keeping their own wallet credentials safe. In particular:
+
+- Do not share private keys with SignalArc, the SignalArc Custom GPT, support channels, or any third party.
+- Do not share seed phrases or recovery phrases with SignalArc, the SignalArc Custom GPT, support channels, or any third party.
+- Do not share wallet passwords or other sensitive wallet credentials with SignalArc, the SignalArc Custom GPT, support channels, or any third party.
+
+SignalArc will never ask for these values. Any request that asks a user for a private key, seed phrase, recovery phrase, or wallet password should be treated as untrusted.
+
+## 8. Retention
+
+SignalArc retains onboarding records, agent session records, market interaction records, and basic API logs for the duration needed to operate, debug, and demonstrate the ARC-TESTNET prototype. Because SignalArc is a prototype on testnet, retention windows may change as the project evolves.
+
+## 9. Contact and Project Links
+
+For questions about this Privacy Policy or the SignalArc prototype:
+
+- App: https://signalarc.fun
+- API: https://api.signalarc.fun
+- Docs: https://docs.signalarc.fun
+- GitHub: https://github.com/wahyu241205/SignalArc
+
+## 10. Changes
+
+SignalArc may update this Privacy Policy as the prototype evolves. The "Last updated" date at the top of this page reflects the most recent revision.
