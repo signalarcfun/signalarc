@@ -169,7 +169,6 @@ export type MarketResponse = {
 
 export type CreateMarketRequest = {
   id: string
-  creator_user_id: string
   title: string
   description?: string
   category?: string
@@ -185,6 +184,21 @@ export type CreateMarketRequest = {
   market_deployment_tx_hash: string
   market_factory_address: string
   resolver_address: string
+}
+
+export type WalletAuthChallenge = {
+  id: string
+  wallet_address: string
+  nonce: string
+  message: string
+  expires_at: string
+}
+
+export type WalletAuthSession = {
+  token: string
+  user_id: string
+  wallet_address: string
+  expires_at: string
 }
 
 export type CreateTradeIntentRequest = {
@@ -240,6 +254,45 @@ type ApiRequestOptions = Omit<RequestInit, "body" | "method"> & {
 
 export const localDemoUserId = "10000000-0000-4000-8000-000000000001"
 export const localApiBaseUrl = "http://localhost:4000"
+
+const walletAuthSessionStorageKey = "signalarc.wallet-auth.session.v1"
+let activeWalletAuthSession: WalletAuthSession | null = null
+
+function readWalletAuthSession() {
+  if (activeWalletAuthSession) return activeWalletAuthSession
+  if (typeof window === "undefined") return null
+
+  try {
+    const stored = window.sessionStorage.getItem(walletAuthSessionStorageKey)
+    if (!stored) return null
+    const session = JSON.parse(stored) as WalletAuthSession
+    if (!session.token || !session.wallet_address || !session.user_id) return null
+    if (new Date(session.expires_at).getTime() <= Date.now()) return null
+    activeWalletAuthSession = session
+    return session
+  } catch {
+    return null
+  }
+}
+
+export function getWalletAuthSession() {
+  return readWalletAuthSession()
+}
+
+export function setWalletAuthSession(session: WalletAuthSession | null) {
+  activeWalletAuthSession = session
+  if (typeof window === "undefined") return
+
+  try {
+    if (session) {
+      window.sessionStorage.setItem(walletAuthSessionStorageKey, JSON.stringify(session))
+    } else {
+      window.sessionStorage.removeItem(walletAuthSessionStorageKey)
+    }
+  } catch {
+    // Session persistence is a convenience; requests remain authenticated in memory.
+  }
+}
 
 function getApiBaseUrl() {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim()
@@ -303,6 +356,11 @@ export async function apiRequest<TData>(
 ): Promise<ApiResponse<TData>> {
   const headers = new Headers(options.headers)
   const hasBody = options.body !== undefined
+  const walletAuthSession = readWalletAuthSession()
+
+  if (walletAuthSession && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${walletAuthSession.token}`)
+  }
 
   if (hasBody && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json")
@@ -350,6 +408,24 @@ export function getMarket(id: string) {
 
 export function createMarket(input: CreateMarketRequest) {
   return apiRequest<MarketResponse>("/markets", {
+    method: "POST",
+    body: input,
+  })
+}
+
+export function createWalletAuthChallenge(address: string) {
+  return apiRequest<{ challenge: WalletAuthChallenge }>("/auth/wallet/challenge", {
+    method: "POST",
+    body: { address },
+  })
+}
+
+export function verifyWalletAuthChallenge(input: {
+  challenge_id: string
+  address: string
+  signature: string
+}) {
+  return apiRequest<{ session: WalletAuthSession }>("/auth/wallet/verify", {
     method: "POST",
     body: input,
   })

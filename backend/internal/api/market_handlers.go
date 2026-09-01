@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -12,9 +13,10 @@ import (
 	"github.com/wahyu241205/SignalArc/backend/internal/market"
 	"github.com/wahyu241205/SignalArc/backend/internal/repository"
 	"github.com/wahyu241205/SignalArc/backend/internal/validation"
+	"github.com/wahyu241205/SignalArc/backend/internal/walletauth"
 )
 
-func registerMarketRoutes(router chi.Router, marketsRepository *repository.MarketsRepository) {
+func registerMarketRoutes(router chi.Router, marketsRepository *repository.MarketsRepository, walletAuthRepository *repository.WalletAuthRepository) {
 	router.Get("/markets", func(w http.ResponseWriter, r *http.Request) {
 		markets, err := marketsRepository.ListMarkets(r.Context(), defaultMarketsLimit)
 		if err != nil {
@@ -39,12 +41,26 @@ func registerMarketRoutes(router chi.Router, marketsRepository *repository.Marke
 		})
 	})
 
-	router.Post("/markets", func(w http.ResponseWriter, r *http.Request) {
+	router.With(func(next http.Handler) http.Handler {
+		return authenticatedWalletUserMiddleware(walletAuthRepository, next)
+	}).Post("/markets", func(w http.ResponseWriter, r *http.Request) {
 		var request market.CreateMarketRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			httpjson.WriteError(w, http.StatusBadRequest, "invalid_json", "invalid JSON request body")
 			return
 		}
+
+		identity, ok := walletAuthIdentityFromContext(r.Context())
+		if !ok {
+			httpjson.WriteError(w, http.StatusUnauthorized, "wallet_auth_required", "wallet authentication is required")
+			return
+		}
+		resolverAddress, err := walletauth.NormalizeAddress(request.ResolverAddress)
+		if err != nil || resolverAddress != identity.WalletAddress {
+			httpjson.WriteError(w, http.StatusForbidden, "resolver_wallet_mismatch", "resolver address must match the authenticated wallet")
+			return
+		}
+		request.CreatorUserID = strings.TrimSpace(identity.UserID)
 
 		input, err := request.ToRepositoryInput(time.Now())
 		if err != nil {

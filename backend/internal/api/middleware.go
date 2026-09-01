@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	cryptorand "crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"net/http"
 	"os"
@@ -11,9 +12,15 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/wahyu241205/SignalArc/backend/internal/httpjson"
+	"github.com/wahyu241205/SignalArc/backend/internal/repository"
 )
 
 type requestIDContextKey struct{}
+type walletAuthIdentityContextKey struct{}
+
+type walletAuthSessionReader interface {
+	GetActiveSessionByTokenHash(context.Context, string) (repository.WalletAuthSession, error)
+}
 
 type responseRecorder struct {
 	http.ResponseWriter
@@ -91,7 +98,7 @@ func localCORSMiddleware(next http.Handler) http.Handler {
 		if isCORSOriginAllowed(origin) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Request-ID")
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Request-ID")
 			w.Header().Set("Access-Control-Expose-Headers", "X-Request-ID")
 			w.Header().Add("Vary", "Origin")
 		}
@@ -103,6 +110,38 @@ func localCORSMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func authenticatedWalletUserMiddleware(sessions walletAuthSessionReader, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authorization := strings.TrimSpace(r.Header.Get("Authorization"))
+		const bearerPrefix = "Bearer "
+		if !strings.HasPrefix(authorization, bearerPrefix) {
+			httpjson.WriteError(w, http.StatusUnauthorized, "wallet_auth_required", "wallet authentication is required")
+			return
+		}
+
+		token := strings.TrimSpace(strings.TrimPrefix(authorization, bearerPrefix))
+		if token == "" {
+			httpjson.WriteError(w, http.StatusUnauthorized, "wallet_auth_required", "wallet authentication is required")
+			return
+		}
+
+		tokenHash := sha256.Sum256([]byte(token))
+		session, err := sessions.GetActiveSessionByTokenHash(r.Context(), hex.EncodeToString(tokenHash[:]))
+		if err != nil {
+			httpjson.WriteError(w, http.StatusUnauthorized, "wallet_auth_invalid", "wallet authentication is invalid or expired")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), walletAuthIdentityContextKey{}, session)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func walletAuthIdentityFromContext(ctx context.Context) (repository.WalletAuthSession, bool) {
+	identity, ok := ctx.Value(walletAuthIdentityContextKey{}).(repository.WalletAuthSession)
+	return identity, ok
 }
 
 func requestLoggingMiddleware(next http.Handler) http.Handler {

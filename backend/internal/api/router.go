@@ -31,6 +31,7 @@ func NewRouter(db *database.DB) http.Handler {
 	agentSessionsRepository := repository.NewAgentSessionsRepository(db)
 	agentIntentsRepository := repository.NewAgentIntentsRepository(db)
 	analyticsRepository := repository.NewAnalyticsRepository(db)
+	walletAuthRepository := repository.NewWalletAuthRepository(db)
 	agentIntentStore := agent.NewStore()
 	cfg := config.Load()
 	circleExecutor := newCircleAgentWalletExecutor(cfg)
@@ -59,8 +60,9 @@ func NewRouter(db *database.DB) http.Handler {
 
 	registerStatusRoutes(router, db)
 	registerArcRoutes(router)
+	registerWalletAuthRoutes(router, walletAuthRepository)
 	registerAnalyticsRoutes(router, analyticsRepository)
-	registerMarketRoutes(router, marketsRepository)
+	registerMarketRoutes(router, marketsRepository, walletAuthRepository)
 	registerTradeRoutes(router, tradesRepository, marketsRepository)
 	registerPositionRoutes(router, positionsRepository)
 	registerResolutionRoutes(router, resolutionsRepository)

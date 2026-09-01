@@ -16,7 +16,6 @@ import {
 import {
   ApiError,
   createMarket,
-  localDemoUserId,
 } from "@/lib/api"
 import {
   ARC_TESTNET_CHAIN_ID,
@@ -26,6 +25,7 @@ import {
   isArcTestnetChain,
 } from "@/lib/contracts"
 import { arcTestnet } from "@/lib/wagmi"
+import { ensureWalletAuthSession } from "@/lib/wallet-auth"
 import {
   closeTimestampSeconds,
   CreateMarketAdvancedFields,
@@ -139,6 +139,7 @@ export function CreateMarketForm() {
 
     let hash: Hash | undefined
     try {
+      await ensureWalletAuthSession(address)
       setDeployState({ status: "deploying", marketId, marketTitle: title })
       hash = await writeContract(config, {
         address: SIGNAL_ARC_MARKET_FACTORY_ADDRESS,
@@ -164,7 +165,6 @@ export function CreateMarketForm() {
 
       const response = await createMarket({
         id: marketId,
-        creator_user_id: requiredText(formData, "creator_user_id"),
         title,
         description: optionalText(formData, "description"),
         category: optionalText(formData, "category"),
@@ -222,8 +222,6 @@ export function CreateMarketForm() {
       </CardHeader>
       <CardContent>
         <form className="grid gap-5" onSubmit={handleSubmit}>
-          <input type="hidden" name="creator_user_id" value={localDemoUserId} />
-
           <CreateMarketFields />
 
           <CreateMarketCoverUploadField

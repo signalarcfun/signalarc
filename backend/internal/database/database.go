@@ -44,6 +44,8 @@ var expectedPhase2Tables = []string{
 	"analytics_markets",
 	"analytics_events",
 	"analytics_summary_cache",
+	"wallet_auth_challenges",
+	"wallet_auth_sessions",
 }
 
 var expectedMarketColumns = []string{
